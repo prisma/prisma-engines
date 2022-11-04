@@ -288,13 +288,30 @@
 <span id="288">288</span>
 <span id="289">289</span>
 <span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{interpreter::InterpretationResult, query_ast::<span class="kw-2">*</span>, result_ast::<span class="kw-2">*</span>};
-<span class="kw">use </span>connector::{<span class="self">self</span>, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection};
+<span class="kw">use </span>connector::{
+    <span class="self">self</span>, error::ConnectorError, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection,
+};
 <span class="kw">use </span>futures::future::{BoxFuture, FutureExt};
 <span class="kw">use </span>inmemory_record_processor::InMemoryRecordProcessor;
 <span class="kw">use </span>prisma_models::ManyRecords;
 <span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>user_facing_errors::KnownError;
 
 <span class="kw">pub fn </span>execute&lt;<span class="lifetime">&#39;conn</span>&gt;(
     tx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="kw-2">mut </span><span class="kw">dyn </span>ConnectionLike,
@@ -352,6 +369,8 @@
                 .into())
             }
 
+            <span class="prelude-val">None </span><span class="kw">if </span>query.options.contains(QueryOption::ThrowOnEmpty) =&gt; record_not_found(),
+
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(QueryResult::RecordSelection(Box::new(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
@@ -378,50 +397,46 @@
     <span class="kw-2">mut </span>query: ManyRecordsQuery,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, InterpretationResult&lt;QueryResult&gt;&gt; {
-    <span class="kw">let </span>fut = <span class="kw">async move </span>{
-        <span class="kw">let </span>(scalars, aggregation_rows) = <span class="kw">if </span>query.args.requires_inmemory_processing() {
-            <span class="kw">let </span>processor = InMemoryRecordProcessor::new_from_query_args(<span class="kw-2">&amp;mut </span>query.args);
-            <span class="kw">let </span>scalars = tx
-                .get_many_records(
-                    <span class="kw-2">&amp;</span>query.model,
-                    query.args.clone(),
-                    <span class="kw-2">&amp;</span>query.selected_fields,
-                    <span class="kw-2">&amp;</span>query.aggregation_selections,
-                    trace_id,
-                )
-                .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let </span>scalars = processor.apply(scalars);
-            <span class="kw">let </span>(scalars, aggregation_rows) =
-                extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
+    <span class="kw">let </span>processor = <span class="kw">if </span>query.args.requires_inmemory_processing() {
+        <span class="prelude-val">Some</span>(InMemoryRecordProcessor::new_from_query_args(<span class="kw-2">&amp;mut </span>query.args))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>};
 
-            (scalars, aggregation_rows)
+    <span class="kw">let </span>fut = <span class="kw">async move </span>{
+        <span class="kw">let </span>scalars = tx
+            .get_many_records(
+                <span class="kw-2">&amp;</span>query.model,
+                query.args.clone(),
+                <span class="kw-2">&amp;</span>query.selected_fields,
+                <span class="kw-2">&amp;</span>query.aggregation_selections,
+                trace_id,
+            )
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">let </span>scalars = <span class="kw">if let </span><span class="prelude-val">Some</span>(p) = processor {
+            p.apply(scalars)
         } <span class="kw">else </span>{
-            <span class="kw">let </span>scalars = tx
-                .get_many_records(
-                    <span class="kw-2">&amp;</span>query.model,
-                    query.args.clone(),
-                    <span class="kw-2">&amp;</span>query.selected_fields,
-                    <span class="kw-2">&amp;</span>query.aggregation_selections,
-                    trace_id,
-                )
-                .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let </span>(scalars, aggregation_rows) =
-                extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
-            (scalars, aggregation_rows)
+            scalars
         };
 
-        <span class="kw">let </span>nested: Vec&lt;QueryResult&gt; = process_nested(tx, query.nested, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>scalars)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>(scalars, aggregation_rows) = extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
 
-        <span class="prelude-val">Ok</span>(RecordSelection {
-            name: query.name,
-            fields: query.selection_order,
-            scalars,
-            nested,
-            query_arguments: query.args,
-            model: query.model,
-            aggregation_rows,
+        <span class="kw">if </span>scalars.records.is_empty() &amp;&amp; query.options.contains(QueryOption::ThrowOnEmpty) {
+            record_not_found()
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>nested: Vec&lt;QueryResult&gt; = process_nested(tx, query.nested, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>scalars)).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(RecordSelection {
+                name: query.name,
+                fields: query.selection_order,
+                scalars,
+                nested,
+                query_arguments: query.args,
+                model: query.model,
+                aggregation_rows,
+            }
+            .into())
         }
-        .into())
     };
 
     fut.boxed()
@@ -455,7 +470,6 @@
             )
             .<span class="kw">await</span><span class="question-mark">?
         </span>};
-
         <span class="kw">let </span>model = query.parent_field.related_model();
         <span class="kw">let </span>nested: Vec&lt;QueryResult&gt; = process_nested(tx, query.nested, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>scalars)).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -577,6 +591,20 @@
     }
 
     (scalars, <span class="prelude-val">Some</span>(aggregation_rows))
+}
+
+<span class="comment">// Custom error built for findXOrThrow queries, when a record is not found and it needs to throw an error
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>record_not_found() -&gt; InterpretationResult&lt;QueryResult&gt; {
+    <span class="prelude-val">Err</span>(ConnectorError {
+        user_facing_error: <span class="prelude-val">Some</span>(KnownError::new(
+            user_facing_errors::query_engine::RecordRequiredButNotFound {
+                cause: <span class="string">&quot;Expected a record, found none.&quot;</span>.to_owned(),
+            },
+        )),
+        kind: connector::error::ErrorKind::RecordDoesNotExist,
+    }
+    .into())
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

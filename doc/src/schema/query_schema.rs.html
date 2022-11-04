@@ -255,6 +255,10 @@
 <span id="255">255</span>
 <span id="256">256</span>
 <span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>prisma_models::{psl::PreviewFeature, InternalDataModelRef, ModelRef};
@@ -403,7 +407,9 @@
 </span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
 </span><span class="kw">pub enum </span>QueryTag {
     FindUnique,
+    FindUniqueOrThrow,
     FindFirst,
+    FindFirstOrThrow,
     FindMany,
     CreateOne,
     CreateMany,
@@ -422,7 +428,9 @@
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">let </span>s = <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::FindUnique =&gt; <span class="string">&quot;findUnique&quot;</span>,
+            <span class="self">Self</span>::FindUniqueOrThrow =&gt; <span class="string">&quot;findUniqueOrThrow&quot;</span>,
             <span class="self">Self</span>::FindFirst =&gt; <span class="string">&quot;findFirst&quot;</span>,
+            <span class="self">Self</span>::FindFirstOrThrow =&gt; <span class="string">&quot;findFirstOrThrow&quot;</span>,
             <span class="self">Self</span>::FindMany =&gt; <span class="string">&quot;findMany&quot;</span>,
             <span class="self">Self</span>::CreateOne =&gt; <span class="string">&quot;createOne&quot;</span>,
             <span class="self">Self</span>::CreateMany =&gt; <span class="string">&quot;createMany&quot;</span>,

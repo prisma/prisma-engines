@@ -1073,6 +1073,7 @@
 <span id="1073">1073</span>
 <span id="1074">1074</span>
 <span id="1075">1075</span>
+<span id="1076">1076</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -1119,6 +1120,7 @@
         nested: <span class="macro">vec!</span>[],
         selection_order: <span class="macro">vec!</span>[],
         aggregation_selections: <span class="macro">vec!</span>[],
+        options: QueryOptions::none(),
     });
 
     Query::Read(read_query)

@@ -36,14 +36,41 @@
 <span id="36">36</span>
 <span id="37">37</span>
 <span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
-<span class="kw">use crate</span>::{query_document::<span class="kw-2">*</span>, ReadQuery, RecordQuery};
+<span class="kw">use crate</span>::{query_document::<span class="kw-2">*</span>, QueryOption, QueryOptions, ReadQuery, RecordQuery};
 <span class="kw">use </span>prisma_models::ModelRef;
 <span class="kw">use </span>schema_builder::constants::args;
 <span class="kw">use </span>std::convert::TryInto;
 
+<span class="kw">pub fn </span>find_unique(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+    find_unique_with_options(field, model, QueryOptions::none())
+}
+
+<span class="kw">pub fn </span>find_unique_or_throw(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+    find_unique_with_options(field, model, QueryOption::ThrowOnEmpty.into())
+}
+
 <span class="doccomment">/// Builds a read query from a parsed incoming read query field.
-</span><span class="kw">pub fn </span>find_unique(<span class="kw-2">mut </span>field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>find_unique_with_options(
+    <span class="kw-2">mut </span>field: ParsedField,
+    model: ModelRef,
+    options: QueryOptions,
+) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     <span class="kw">let </span>filter = <span class="kw">match </span>field.arguments.lookup(args::WHERE) {
         <span class="prelude-val">Some</span>(where_arg) =&gt; {
             <span class="kw">let </span>arg: ParsedInputMap = where_arg.value.try_into()<span class="question-mark">?</span>;
@@ -72,6 +99,7 @@
         nested,
         selection_order,
         aggregation_selections,
+        options,
     }))
 }
 </code></pre></div>

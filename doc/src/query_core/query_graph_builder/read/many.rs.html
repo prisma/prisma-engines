@@ -28,11 +28,38 @@
 <span id="28">28</span>
 <span id="29">29</span>
 <span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
-<span class="kw">use crate</span>::{query_document::ParsedField, ManyRecordsQuery, ReadQuery};
+<span class="kw">use crate</span>::{query_document::ParsedField, ManyRecordsQuery, QueryOption, QueryOptions, ReadQuery};
 <span class="kw">use </span>prisma_models::ModelRef;
 
 <span class="kw">pub fn </span>find_many(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+    find_many_with_options(field, model, QueryOptions::none())
+}
+
+<span class="kw">pub fn </span>find_many_or_throw(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+    find_many_with_options(field, model, QueryOption::ThrowOnEmpty.into())
+}
+
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>find_many_with_options(
+    field: ParsedField,
+    model: ModelRef,
+    options: QueryOptions,
+) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     <span class="kw">let </span>args = extractors::extract_query_args(field.arguments, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
     <span class="kw">let </span>name = field.name;
     <span class="kw">let </span>alias = field.alias;
@@ -56,6 +83,7 @@
         nested,
         selection_order,
         aggregation_selections,
+        options,
     }))
 }
 </code></pre></div>

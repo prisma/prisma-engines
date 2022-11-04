@@ -850,6 +850,8 @@
 <span id="850">850</span>
 <span id="851">851</span>
 <span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>error;
 <span class="kw">mod </span>formatters;
 <span class="kw">mod </span>guard;
@@ -860,7 +862,8 @@
 <span class="kw">pub use </span>transformers::<span class="kw-2">*</span>;
 
 <span class="kw">use crate</span>::{
-    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, ReadQuery,
+    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, QueryOptions,
+    ReadQuery,
 };
 <span class="kw">use </span>connector::{IntoFilter, QueryArguments};
 <span class="kw">use </span>guard::<span class="kw-2">*</span>;
@@ -1670,6 +1673,7 @@
                 nested: <span class="macro">vec!</span>[],
                 selection_order: <span class="macro">vec!</span>[],
                 aggregation_selections: <span class="macro">vec!</span>[],
+                options: QueryOptions::none(),
             });
 
             <span class="kw">let </span>query = Query::Read(read_query);
