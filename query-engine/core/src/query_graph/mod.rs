@@ -3,13 +3,13 @@ mod formatters;
 mod guard;
 mod transformers;
 
+use enumflags2::BitFlags;
 pub use error::*;
 pub use formatters::*;
 pub use transformers::*;
 
 use crate::{
-    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, QueryOptions,
-    ReadQuery,
+    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, ReadQuery,
 };
 use connector::{IntoFilter, QueryArguments};
 use guard::*;
@@ -819,7 +819,7 @@ impl QueryGraph {
                 nested: vec![],
                 selection_order: vec![],
                 aggregation_selections: vec![],
-                options: QueryOptions::none(),
+                options: BitFlags::EMPTY,
             });
 
             let query = Query::Read(read_query);

@@ -4,6 +4,7 @@ use crate::{
     ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs, WriteOperation};
+use enumflags2::BitFlags;
 use indexmap::IndexMap;
 use prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
 use psl::dml::ReferentialAction;
@@ -44,7 +45,7 @@ where
         nested: vec![],
         selection_order: vec![],
         aggregation_selections: vec![],
-        options: QueryOptions::none(),
+        options: BitFlags::EMPTY,
     });
 
     Query::Read(read_query)
