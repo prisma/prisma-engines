@@ -492,6 +492,215 @@ fn enum_array_modification_should_work(api: TestApi) {
         .assert_applied_migrations(&[]);
 }
 
+// Bug: https://github.com/prisma/prisma/issues/15705
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn alter_enum_and_change_scalar_default_must_work(api: TestApi) {
+    let plain_dm = r#"
+        datasource db {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+
+        model Cat {
+            id      Int    @id
+            moods   Mood @default(HUNGRY)
+        }
+
+        enum Mood {
+            HUNGRY
+            SLEEPY
+        }
+    "#;
+
+    let dir = api.create_migrations_directory();
+    api.create_migration("plain", &plain_dm, &dir).send_sync();
+
+    let custom_dm = r#"
+        datasource test {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+
+        model Cat {
+            id      Int    @id
+            moods   Mood @default(MOODY)
+        }
+
+        enum Mood {
+            SLEEPY
+            MOODY
+        }
+    "#;
+
+    api.create_migration("custom", &custom_dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(2)
+        .assert_migration("custom", move |migration| {
+            let expected_script = expect![[r#"
+                /*
+                  Warnings:
+
+                  - The values [HUNGRY] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.
+
+                */
+                -- AlterEnum
+                BEGIN;
+                CREATE TYPE "Mood_new" AS ENUM ('SLEEPY', 'MOODY');
+                ALTER TABLE "Cat" ALTER COLUMN "moods" DROP DEFAULT;
+                ALTER TABLE "Cat" ALTER COLUMN "moods" TYPE "Mood_new" USING ("moods"::text::"Mood_new");
+                ALTER TYPE "Mood" RENAME TO "Mood_old";
+                ALTER TYPE "Mood_new" RENAME TO "Mood";
+                DROP TYPE "Mood_old";
+                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT 'MOODY';
+                COMMIT;
+
+                -- AlterTable
+                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT 'MOODY';
+            "#]];
+            migration.expect_contents(expected_script)
+        });
+
+    // TODO: assert that re-introspection here doesn't change the `custom_dm` schema.
+}
+
+// Bug: https://github.com/prisma/prisma/issues/15705
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn alter_enum_and_drop_default_empty_list_must_work(api: TestApi) {
+    let plain_dm = r#"
+        datasource db {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+
+        model Cat {
+            id      Int    @id
+            moods   Mood[] @default([])
+        }
+
+        enum Mood {
+            SLEEPY
+            MOODY
+        }
+    "#;
+
+    let dir = api.create_migrations_directory();
+    api.create_migration("plain", &plain_dm, &dir).send_sync();
+
+    let custom_dm = r#"
+        datasource test {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+
+        model Cat {
+            id      Int    @id
+            moods   Mood[]
+        }
+
+        enum Mood {
+            HUNGRY
+            SLEEPY
+        }
+    "#;
+
+    api.create_migration("custom", &custom_dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(2)
+        .assert_migration("custom", move |migration| {
+            let expected_script = expect![[r#"
+                /*
+                  Warnings:
+
+                  - The values [MOODY] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.
+
+                */
+                -- AlterEnum
+                BEGIN;
+                CREATE TYPE "Mood_new" AS ENUM ('HUNGRY', 'SLEEPY');
+                ALTER TABLE "Cat" ALTER COLUMN "moods" DROP DEFAULT;
+                ALTER TABLE "Cat" ALTER COLUMN "moods" TYPE "Mood_new"[] USING ("moods"::text::"Mood_new"[]);
+                ALTER TYPE "Mood" RENAME TO "Mood_old";
+                ALTER TYPE "Mood_new" RENAME TO "Mood";
+                DROP TYPE "Mood_old";
+                COMMIT;
+
+                -- AlterTable
+                ALTER TABLE "Cat" ALTER COLUMN "moods" DROP DEFAULT;
+            "#]];
+            migration.expect_contents(expected_script)
+        });
+
+    // TODO: assert that re-introspection here doesn't change the `custom_dm` schema.
+}
+
+// Bug: https://github.com/prisma/prisma/issues/15705
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn alter_enum_with_default_empty_list_must_work(api: TestApi) {
+    let plain_dm = r#"
+        datasource db {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+
+        model Cat {
+            id      Int    @id
+            moods   Mood[] @default([])
+        }
+
+        enum Mood {
+            SLEEPY
+            MOODY
+        }
+    "#;
+
+    let dir = api.create_migrations_directory();
+    api.create_migration("plain", &plain_dm, &dir).send_sync();
+
+    let custom_dm = r#"
+        datasource test {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+
+        model Cat {
+            id      Int    @id
+            moods   Mood[] @default([])
+        }
+
+        enum Mood {
+            HUNGRY
+            SLEEPY
+        }
+    "#;
+
+    api.create_migration("custom", &custom_dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(2)
+        .assert_migration("custom", move |migration| {
+            let expected_script = expect![[r#"
+                /*
+                  Warnings:
+
+                  - The values [MOODY] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.
+
+                */
+                -- AlterEnum
+                BEGIN;
+                CREATE TYPE "Mood_new" AS ENUM ('HUNGRY', 'SLEEPY');
+                ALTER TABLE "Cat" ALTER COLUMN "moods" DROP DEFAULT;
+                ALTER TABLE "Cat" ALTER COLUMN "moods" TYPE "Mood_new"[] USING ("moods"::text::"Mood_new"[]);
+                ALTER TYPE "Mood" RENAME TO "Mood_old";
+                ALTER TYPE "Mood_new" RENAME TO "Mood";
+                DROP TYPE "Mood_old";
+                ALTER TABLE "Cat" ALTER COLUMN "moods";
+                COMMIT;
+            "#]];
+            migration.expect_contents(expected_script)
+        });
+
+    // TODO: assert that re-introspection here doesn't change the `custom_dm` schema.
+}
+
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn mapped_enum_defaults_must_work(api: TestApi) {
     let schema = r#"
