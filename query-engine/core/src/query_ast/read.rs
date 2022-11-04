@@ -92,6 +92,34 @@ impl Display for ReadQuery {
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum QueryOption {
     ThrowOnEmpty,
+    Other,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct QueryOptions(BitFlags<QueryOption>);
+
+// Allows for: QueryOption::ThrowOnEmpty.into()  to be a QueryOptions
+impl From<QueryOption> for QueryOptions {
+    fn from(options: QueryOption) -> Self {
+        QueryOptions(options.into())
+    }
+}
+
+// Allows for: (QueryOption::ThrowOnEmpty | QueryOption::Other).into()  to be a QueryOptions
+impl From<BitFlags<QueryOption>> for QueryOptions {
+    fn from(options: BitFlags<QueryOption>) -> Self {
+        QueryOptions(options)
+    }
+}
+
+impl QueryOptions {
+    pub fn none() -> Self {
+        Self(BitFlags::empty())
+    }
+
+    pub fn contains(&self, option: QueryOption) -> bool {
+        self.0.contains(option)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -104,7 +132,7 @@ pub struct RecordQuery {
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
-    pub options: BitFlags<QueryOption>,
+    pub options: QueryOptions,
 }
 
 #[derive(Debug, Clone)]
@@ -117,7 +145,7 @@ pub struct ManyRecordsQuery {
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
-    pub options: BitFlags<QueryOption>,
+    pub options: QueryOptions,
 }
 
 #[derive(Debug, Clone)]
