@@ -56,7 +56,7 @@ fn find_unique_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
 /// that will throw a NotFoundError if the item is not found
 fn find_unique_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     arguments::where_unique_argument(ctx, model).map(|arg| {
-        let field_name = format!("findUniqueOrThrow{}", model.name);
+        let field_name = format!("findUnique{}OrThrow", model.name);
 
         field(
             field_name,
@@ -92,7 +92,7 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 /// not exist
 fn find_first_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::relation_selection_arguments(ctx, model, true);
-    let field_name = format!("findFirstOrThrow{}", model.name);
+    let field_name = format!("findFirst{}OrThrow", model.name);
 
     field(
         field_name,

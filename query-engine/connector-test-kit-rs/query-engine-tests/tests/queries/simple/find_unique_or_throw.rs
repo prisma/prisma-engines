@@ -10,20 +10,20 @@ mod find_unique_or_throw {
 
         assert_query!(
             &runner,
-            r#"query { findUniqueOrThrowUser(where: { email: "a@b.com" }) { id } }"#,
-            r#"{"data":{"findUniqueOrThrowUser":{"id":1}}}"#
+            r#"query { findUniqueUserOrThrow(where: { email: "a@b.com" }) { id } }"#,
+            r#"{"data":{"findUniqueUserOrThrow":{"id":1}}}"#
         );
 
         assert_query!(
             &runner,
-            r#"query { findUniqueOrThrowUser(where: { first_name_last_name: { first_name: "Elongated", last_name: "Muskrat" } }) { id } }"#,
-            r#"{"data":{"findUniqueOrThrowUser":{"id":1}}}"#
+            r#"query { findUniqueUserOrThrow(where: { first_name_last_name: { first_name: "Elongated", last_name: "Muskrat" } }) { id } }"#,
+            r#"{"data":{"findUniqueUserOrThrow":{"id":1}}}"#
         );
 
         assert_query!(
             runner,
-            "query { findUniqueOrThrowUser(where: { id: 1 }) { id } }",
-            r#"{"data":{"findUniqueOrThrowUser":{"id":1}}}"#
+            "query { findUniqueUserOrThrow(where: { id: 1 }) { id } }",
+            r#"{"data":{"findUniqueUserOrThrow":{"id":1}}}"#
         );
 
         Ok(())
@@ -35,7 +35,7 @@ mod find_unique_or_throw {
 
         assert_error!(
             &runner,
-            "query { findUniqueOrThrowUser(where: { id: 2 }) { id } }",
+            "query { findUniqueUserOrThrow(where: { id: 2 }) { id } }",
             2025,
             "An operation failed because it depends on one or more records that were required but not found. Expected a record, found none."
         );
@@ -49,7 +49,7 @@ mod find_unique_or_throw {
 
         assert_error!(
           &runner,
-          r#"query { findUniqueOrThrowUser(where: { email: "b@a.com" }) { id } }"#,
+          r#"query { findUniqueUserOrThrow(where: { email: "b@a.com" }) { id } }"#,
           2025,
           "An operation failed because it depends on one or more records that were required but not found. Expected a record, found none."
         );
@@ -63,7 +63,7 @@ mod find_unique_or_throw {
 
         assert_error!(
           &runner,
-          r#"query { findUniqueOrThrowUser(where: { first_name_last_name: { first_name: "Doesn't", last_name: "Exist" } }) { id } }"#,
+          r#"query { findUniqueUserOrThrow(where: { first_name_last_name: { first_name: "Doesn't", last_name: "Exist" } }) { id } }"#,
           2025,
           "An operation failed because it depends on one or more records that were required but not found. Expected a record, found none."
         );
