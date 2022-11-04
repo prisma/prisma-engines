@@ -1,6 +1,6 @@
 use introspection_engine_tests::test_api::*;
 
-// Older versions of MySQL (5.6+) raise a syntax error on CREATE TABLE declarations with `SET DEFAULT` referential actions,
+// Older versions of MySQL (5.6+) raise a syntax error on `CREATE TABLE` declarations with `SET DEFAULT` referential actions,
 // so we can skip introspecting those. MariaDb 10.0 suffers from the same issue.
 #[test_connector(tags(Mysql8))]
 async fn introspect_set_default_should_fail(api: &TestApi) -> TestResult {
