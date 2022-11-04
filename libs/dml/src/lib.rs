@@ -1,7 +1,7 @@
 //! This module contains the models representing the Datamodel part of a Prisma schema.
 //! It contains the main data structures that the engines can build upon.
 
-#![allow(clippy::derive_partial_eq_without_eq)]
+#![allow(clippy::derive_partial_eq_without_eq, clippy::expect_fun_call)]
 
 mod datamodel;
 mod lift;

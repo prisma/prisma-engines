@@ -313,7 +313,7 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
                     "direct_report_fkey",
                     types::foreign_constraint(&["direct_report"], "User", &["id"], None, None),
                 );
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;

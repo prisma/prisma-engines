@@ -73,7 +73,7 @@ pub(crate) fn warning_models_without_identifier(affected: &[Model]) -> Warning {
     Warning {
         code: 1,
         message: "The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.".into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -82,7 +82,7 @@ pub(crate) fn warning_fields_with_empty_names(affected: &[ModelAndField]) -> War
         code: 2,
         message: "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
             .into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -90,7 +90,7 @@ pub(crate) fn warning_unsupported_types(affected: &[ModelAndFieldAndType]) -> Wa
     Warning {
         code: 3,
         message: "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.".into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -99,7 +99,7 @@ pub(crate) fn warning_enum_values_with_empty_names(affected: &[EnumAndValue]) ->
         code: 4,
         message: "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
             .into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -109,7 +109,7 @@ pub(crate) fn warning_default_cuid_warning(affected: &[ModelAndField]) -> Warnin
         message:
             "These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1."
                 .into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -119,7 +119,7 @@ pub(crate) fn warning_default_uuid_warning(affected: &[ModelAndField]) -> Warnin
         message:
             "These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1."
                 .into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -127,7 +127,7 @@ pub(crate) fn warning_enriched_with_map_on_model(affected: &[Model]) -> Warning 
     Warning {
         code: 7,
         message: "These models were enriched with `@@map` information taken from the previous Prisma schema.".into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -135,7 +135,7 @@ pub(crate) fn warning_enriched_with_map_on_field(affected: &[ModelAndField]) -> 
     Warning {
         code: 8,
         message: "These fields were enriched with `@map` information taken from the previous Prisma schema.".into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -143,7 +143,7 @@ pub(crate) fn warning_enriched_with_map_on_enum(affected: &[Enum]) -> Warning {
     Warning {
         code: 9,
         message: "These enums were enriched with `@@map` information taken from the previous Prisma schema.".into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -152,7 +152,7 @@ pub(crate) fn warning_enriched_with_map_on_enum_value(affected: &[EnumAndValue])
         code: 10,
         message: "These enum values were enriched with `@map` information taken from the previous Prisma schema."
             .into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -162,7 +162,7 @@ pub(crate) fn warning_enriched_with_cuid(affected: &[ModelAndField]) -> Warning 
         message:
             "These id fields were enriched with `@default(cuid())` information taken from the previous Prisma schema."
                 .into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -172,7 +172,7 @@ pub(crate) fn warning_enriched_with_uuid(affected: &[ModelAndField]) -> Warning 
         message:
             "These id fields were enriched with `@default(uuid())` information taken from the previous Prisma schema."
                 .into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -182,7 +182,7 @@ pub(crate) fn warning_enriched_with_updated_at(affected: &[ModelAndField]) -> Wa
         message:
             "These DateTime fields were enriched with `@updatedAt` information taken from the previous Prisma schema."
                 .into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -192,7 +192,7 @@ pub(crate) fn warning_models_without_columns(affected: &[Model]) -> Warning {
     Warning {
         code: 14,
         message: "The following models were commented out as we could not retrieve columns for them. Please check your privileges.".into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -200,7 +200,7 @@ pub(crate) fn warning_enriched_with_custom_index_names(affected: &[ModelAndIndex
     Warning {
         code: 17,
         message: "These Indices were enriched with custom index names taken from the previous Prisma schema.".into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
@@ -209,7 +209,7 @@ pub(crate) fn warning_enriched_with_custom_primary_key_names(affected: &[Model])
         code: 18,
         message: "These models were enriched with custom compound id names taken from the previous Prisma schema."
             .into(),
-        affected: serde_json::to_value(&affected).unwrap(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 

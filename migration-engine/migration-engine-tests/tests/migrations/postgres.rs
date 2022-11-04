@@ -421,7 +421,7 @@ fn failing_enum_migrations_should_not_be_partially_applied(api: TestApi) {
         .assert_green();
 
     {
-        let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), &["id", "mood"])
+        let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), ["id", "mood"])
             .values((Value::text("felix"), Value::enum_variant("HUNGRY")))
             .values((Value::text("mittens"), Value::enum_variant("HAPPY")));
 

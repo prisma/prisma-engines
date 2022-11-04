@@ -18,13 +18,13 @@ async fn introspecting_non_default_pkey_names_works(api: &TestApi) -> TestResult
         .execute(|migration| {
             migration.create_table("Single", move |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("SomethingCustom", types::primary_constraint(&["id"]));
+                t.add_constraint("SomethingCustom", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Compound", move |t| {
                 t.add_column("a", types::integer().increments(false).nullable(false));
                 t.add_column("b", types::integer().increments(false).nullable(false));
-                t.add_constraint("SomethingCustomCompound", types::primary_constraint(&["a", "b"]));
+                t.add_constraint("SomethingCustomCompound", types::primary_constraint(["a", "b"]));
             });
         })
         .await?;
@@ -53,13 +53,13 @@ async fn introspecting_default_pkey_names_works(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("Single", move |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Single_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Single_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Compound", move |t| {
                 t.add_column("a", types::integer().increments(false).nullable(false));
                 t.add_column("b", types::integer().increments(false).nullable(false));
-                t.add_constraint("Compound_pkey", types::primary_constraint(&["a", "b"]));
+                t.add_constraint("Compound_pkey", types::primary_constraint(["a", "b"]));
             });
         })
         .await?;
@@ -88,13 +88,13 @@ async fn introspecting_non_default_unique_constraint_names_works(api: &TestApi) 
         .execute(|migration| {
             migration.create_table("Single", move |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("SomethingCustom", types::unique_constraint(&["id"]));
+                t.add_constraint("SomethingCustom", types::unique_constraint(["id"]));
             });
 
             migration.create_table("Compound", move |t| {
                 t.add_column("a", types::integer().increments(false).nullable(false));
                 t.add_column("b", types::integer().increments(false).nullable(false));
-                t.add_constraint("SomethingCustomCompound", types::unique_constraint(&["a", "b"]));
+                t.add_constraint("SomethingCustomCompound", types::unique_constraint(["a", "b"]));
             });
         })
         .await?;
@@ -123,13 +123,13 @@ async fn introspecting_default_unique_names_works(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("Single", move |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Single_id_key", types::unique_constraint(&["id"]));
+                t.add_constraint("Single_id_key", types::unique_constraint(["id"]));
             });
 
             migration.create_table("Compound", move |t| {
                 t.add_column("a", types::integer().increments(false).nullable(false));
                 t.add_column("b", types::integer().increments(false).nullable(false));
-                t.add_constraint("Compound_a_b_key", types::unique_constraint(&["a", "b"]));
+                t.add_constraint("Compound_a_b_key", types::unique_constraint(["a", "b"]));
             });
         })
         .await?;
@@ -158,13 +158,13 @@ async fn introspecting_non_default_index_names_works(api: &TestApi) -> TestResul
         .execute(|migration| {
             migration.create_table("Single", move |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_index("SomethingCustom", types::index(&["id"]));
+                t.add_index("SomethingCustom", types::index(["id"]));
             });
 
             migration.create_table("Compound", move |t| {
                 t.add_column("a", types::integer().increments(false).nullable(false));
                 t.add_column("b", types::integer().increments(false).nullable(false));
-                t.add_index("SomethingCustomCompound", types::index(&["a", "b"]));
+                t.add_index("SomethingCustomCompound", types::index(["a", "b"]));
             });
         })
         .await?;
@@ -199,13 +199,13 @@ async fn introspecting_default_index_names_works(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("Single", move |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_index("Single_id_idx", types::index(&["id"]));
+                t.add_index("Single_id_idx", types::index(["id"]));
             });
 
             migration.create_table("Compound", move |t| {
                 t.add_column("a", types::integer().increments(false).nullable(false));
                 t.add_column("b", types::integer().increments(false).nullable(false));
-                t.add_index("Compound_a_b_idx", types::index(&["a", "b"]));
+                t.add_index("Compound_a_b_idx", types::index(["a", "b"]));
             });
         })
         .await?;
@@ -240,14 +240,14 @@ async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
         .execute(move |migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", move |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
                 t.add_column("user_id", types::integer().nullable(false));
-                t.add_index("Post_user_id_idx", types::index(&["user_id"]));
+                t.add_index("Post_user_id_idx", types::index(["user_id"]));
                 t.add_constraint(
                     "Post_user_id_fkey",
                     types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
@@ -282,14 +282,14 @@ async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
         .execute(move |migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", move |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
                 t.add_column("user_id", types::integer().nullable(false));
-                t.add_index("Post_user_id_idx", types::index(&["user_id"]));
+                t.add_index("Post_user_id_idx", types::index(["user_id"]));
                 t.add_constraint(
                     "CustomFKName",
                     types::foreign_constraint(&["user_id"], "User", &["id"], None, None),

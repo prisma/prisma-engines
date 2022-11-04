@@ -221,7 +221,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
         .execute(move |migration| {
             migration.create_table("User", |table| {
                 table.add_column("id", types::integer().increments(true));
-                table.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                table.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Event", |table| {
@@ -231,7 +231,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
                 table.inject_custom(
                     "CONSTRAINT host_id FOREIGN KEY (host_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
                 );
-                table.add_constraint("Event_pkey", types::primary_constraint(&["id"]));
+                table.add_constraint("Event_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("_EventToUser", |table| {
@@ -540,14 +540,14 @@ async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResul
         .execute(move |migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", move |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
                 t.add_column("user_id", types::integer().nullable(false));
-                t.add_index("Post_user_id_key", types::index(&["user_id"]).unique(true));
+                t.add_index("Post_user_id_key", types::index(["user_id"]).unique(true));
                 t.inject_custom(
                     "CONSTRAINT CustomFKName FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
                 );

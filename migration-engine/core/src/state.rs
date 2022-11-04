@@ -219,7 +219,7 @@ impl GenericApi for EngineState {
         let url: String = match &params.datasource_type {
             DbExecuteDatasourceType::Url(UrlContainer { url }) => url.clone(),
             DbExecuteDatasourceType::Schema(SchemaContainer { schema: file_path }) => {
-                let mut schema_file = std::fs::File::open(&file_path)
+                let mut schema_file = std::fs::File::open(file_path)
                     .map_err(|err| ConnectorError::from_source(err, "Opening Prisma schema file."))?;
                 let mut schema_string = String::new();
                 schema_file

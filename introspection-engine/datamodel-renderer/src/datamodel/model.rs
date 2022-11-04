@@ -506,14 +506,14 @@ mod tests {
         id.clustered(false);
         model.id(id);
 
-        let unique = IndexDefinition::unique(["foo", "bar"].iter().map(|s| IndexFieldInput::new(*s)));
+        let unique = IndexDefinition::unique(["foo", "bar"].iter().map(|s| IndexFieldInput::new(s)));
         model.push_index(unique);
 
-        let mut index = IndexDefinition::index(["foo", "bar"].iter().map(|s| IndexFieldInput::new(*s)));
+        let mut index = IndexDefinition::index(["foo", "bar"].iter().map(|s| IndexFieldInput::new(s)));
         index.index_type("BTree");
         model.push_index(index);
 
-        let fulltext = IndexDefinition::fulltext(["foo", "bar"].iter().map(|s| IndexFieldInput::new(*s)));
+        let fulltext = IndexDefinition::fulltext(["foo", "bar"].iter().map(|s| IndexFieldInput::new(s)));
         model.push_index(fulltext);
 
         model.schema("public");

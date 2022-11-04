@@ -15,6 +15,7 @@ impl<'a> Renderer for GqlTypeRenderer<'a> {
     }
 }
 
+#[allow(clippy::only_used_in_recursion)]
 impl<'a> GqlTypeRenderer<'a> {
     fn render_input_type(&self, i: &InputType, ctx: &mut RenderContext) -> String {
         match i {

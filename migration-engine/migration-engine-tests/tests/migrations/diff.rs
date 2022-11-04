@@ -420,9 +420,9 @@ fn diff_sqlite_migration_directories() {
     let base_dir_str_2 = base_dir_2.path().to_str().unwrap();
 
     let migrations_lock_path = base_dir.path().join("migration_lock.toml");
-    std::fs::write(&migrations_lock_path, &"provider = \"sqlite\"").unwrap();
+    std::fs::write(&migrations_lock_path, "provider = \"sqlite\"").unwrap();
     let migrations_lock_path = base_dir_2.path().join("migration_lock.toml");
-    std::fs::write(&migrations_lock_path, &"provider = \"sqlite\"").unwrap();
+    std::fs::write(&migrations_lock_path, "provider = \"sqlite\"").unwrap();
 
     let params = DiffParams {
         exit_code: None,

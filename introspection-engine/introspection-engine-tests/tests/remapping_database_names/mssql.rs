@@ -52,7 +52,7 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("User with Space", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("User with Space_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User with Space_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", |t| {
@@ -67,7 +67,7 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
                     "post_user_unique",
                     types::unique_constraint(vec!["user_id"]).unique(true),
                 );
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;
@@ -104,7 +104,7 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
                     "user_unique",
                     types::unique_constraint(vec!["id", "age-that-is-invalid"]),
                 );
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", move |t| {
@@ -127,7 +127,7 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
                     "post_user_unique",
                     types::unique_constraint(vec!["user_id", "user_age"]),
                 );
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;

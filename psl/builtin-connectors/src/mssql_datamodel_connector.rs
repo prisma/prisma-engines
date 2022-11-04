@@ -166,7 +166,7 @@ impl Connector for MsSqlDatamodelConnector {
             let path = std::path::Path::new(&path);
 
             if path.is_relative() {
-                Some(config_dir.join(&path).to_str().map(ToString::to_string).unwrap())
+                Some(config_dir.join(path).to_str().map(ToString::to_string).unwrap())
             } else {
                 Some(path.to_str().unwrap().to_string())
             }
