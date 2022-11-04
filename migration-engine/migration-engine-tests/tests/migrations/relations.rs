@@ -572,9 +572,11 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
     }
 }
 
-// 5.6 and 5.7 doesn't let you `SET DEFAULT` without setting the default value
-// (even if nullable). Maria will silently just use `RESTRICT` instead.
-#[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql, Vitess, CockroachDb))]
+// "mysql" provider bug: https://github.com/prisma/prisma/issues/11498
+// MySQL 5.6+ raises a syntax error when declaring `SET DEFAULT` in a `CREATE TABLE`/`ALTER TABLE` statement.
+// MySQL 8.0+ & MariaDB 10.0 allow you to create a table with `SET DEFAULT` referential action, but as soon as such action
+// is triggered, a runtime foreign key constraint error is raised, due to the databases silently using `NO ACTION`/`RESTRICT` instead.
+#[test_connector(exclude(Mysql, Mariadb, Mssql, Vitess, CockroachDb))]
 fn on_delete_set_default_should_work(api: TestApi) {
     let dm = r#"
         model A {
@@ -660,9 +662,11 @@ fn on_update_referential_actions_should_work(api: TestApi) {
     }
 }
 
-// 5.6 and 5.7 doesn't let you `SET DEFAULT` without setting the default value
-// (even if nullable). Maria will silently just use `RESTRICT` instead.
-#[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql, Vitess, CockroachDb))]
+// "mysql" provider bug: https://github.com/prisma/prisma/issues/11498
+// MySQL 5.6+ raises a syntax error when declaring `SET DEFAULT` in a `CREATE TABLE`/`ALTER TABLE` statement.
+// MySQL 8.0+ & MariaDB 10.0 allow you to create a table with `SET DEFAULT` referential action, but as soon as such action
+// is triggered, a runtime foreign key constraint error is raised, due to the databases silently using `NO ACTION`/`RESTRICT` instead.
+#[test_connector(exclude(Mysql, Mariadb, Mssql, Vitess, CockroachDb))]
 fn on_update_set_default_should_work(api: TestApi) {
     let dm = r#"
         model A {
