@@ -153,6 +153,8 @@ fn read_many(
             .map(|field| (field.prisma_name().to_owned(), field.clone()))
             .collect();
 
+        // dbg!(&scalars.field_names);
+
         let nested = process_nested_reads(&query.nested, &field_names, &mut scalars)?;
 
         // let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
@@ -270,6 +272,7 @@ fn process_nested_read(
     parent_selection: &HashMap<String, SelectedField>,
     scalars: &mut ManyRecords,
 ) -> crate::Result<QueryResult> {
+    // dbg!(&scalars);
     let read = nested_read.as_related_records_query().unwrap();
 
     // { <"join_alias">: ScalarFieldRef }
@@ -279,6 +282,8 @@ fn process_nested_read(
         .enumerate()
         .map(|(i, field)| (read.db_alias(i), field.clone()))
         .collect();
+
+    // dbg!(&child_field_names);
 
     // Go depth-first so that the parent data of relations isn't extracted yet.
     let nested = process_nested_reads(&read.nested, &child_field_names, scalars)?;
@@ -299,6 +304,8 @@ fn process_nested_read(
         })
         .collect_vec();
 
+    // dbg!(&value_indexes_to_remove);
+
     let parent_ids = rf.model().primary_identifier();
     // [(ScalarFieldRef), <index_to_remove>, ...]
     let parent_indexes = scalars
@@ -314,6 +321,8 @@ fn process_nested_read(
         })
         .collect_vec();
 
+    // dbg!(&parent_indexes);
+
     let mut nested_records: IndexSet<Record> = IndexSet::new();
 
     // Remove and collect all nested values
@@ -324,8 +333,8 @@ fn process_nested_read(
             .iter()
             .map(|(parent_id, i)| (parent_id.clone(), record.values.get(*i).unwrap().clone()))
             .collect_vec();
-        let mut values = vec![];
 
+        let mut values = vec![];
         let mut skip_record = false;
 
         for (child_id, value_index) in value_indexes_to_remove.iter() {
@@ -334,12 +343,12 @@ fn process_nested_read(
 
             // if value is a child id and that child id is null, then it means it wasn't found by the join
             // so we skip the record entirely
+            // We don't break as we need to keep removing values even if they're null
             if child_ids.contains(child_id.prisma_name()) && value == PrismaValue::Null {
                 skip_record = true;
-                break;
+            } else {
+                values.push(value);
             }
-
-            values.push(value);
 
             n_value_removed += 1;
         }
