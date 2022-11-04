@@ -65,7 +65,7 @@ fn read_one(
                 .into())
             }
 
-            None if query.options.throw_on_empty() => record_not_found(),
+            None if query.options.contains(QueryOption::ThrowOnEmpty) => record_not_found(),
 
             None => Ok(QueryResult::RecordSelection(Box::new(RecordSelection {
                 name: query.name,
@@ -118,7 +118,7 @@ fn read_many(
 
         let (scalars, aggregation_rows) = extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
 
-        if scalars.records.is_empty() && query.options.throw_on_empty() {
+        if scalars.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
             record_not_found()
         } else {
             let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;

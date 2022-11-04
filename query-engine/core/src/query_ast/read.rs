@@ -1,6 +1,7 @@
 //! Prisma read query AST
 use super::FilteredQuery;
 use connector::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
+use enumflags2::BitFlags;
 use prisma_models::prelude::*;
 use std::fmt::Display;
 
@@ -86,37 +87,11 @@ impl Display for ReadQuery {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[enumflags2::bitflags]
+#[repr(u8)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum QueryOption {
     ThrowOnEmpty,
-}
-pub const THROW_ON_EMPTY: [QueryOption; 1] = [QueryOption::ThrowOnEmpty];
-
-#[derive(Debug, Clone)]
-pub struct QueryOptions(pub Vec<QueryOption>);
-
-impl QueryOptions {
-    pub fn throw_on_empty(&self) -> bool {
-        self.contains(&QueryOption::ThrowOnEmpty)
-    }
-
-    pub fn contains(&self, option: &QueryOption) -> bool {
-        self.0.contains(option)
-    }
-
-    pub fn iter(&self) -> impl Iterator<Item = &QueryOption> {
-        self.0.iter()
-    }
-
-    pub fn none() -> Self {
-        Self(Vec::new())
-    }
-}
-
-impl From<Vec<QueryOption>> for QueryOptions {
-    fn from(options: Vec<QueryOption>) -> Self {
-        Self(options)
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -129,7 +104,7 @@ pub struct RecordQuery {
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
-    pub options: QueryOptions,
+    pub options: BitFlags<QueryOption>,
 }
 
 #[derive(Debug, Clone)]
@@ -142,7 +117,7 @@ pub struct ManyRecordsQuery {
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
-    pub options: QueryOptions,
+    pub options: BitFlags<QueryOption>,
 }
 
 #[derive(Debug, Clone)]
